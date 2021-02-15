@@ -7,10 +7,7 @@ import sys
 import shutil
 from setuptools import setup
 
-try:  # for pip >= 10
-    from pip._internal.req import parse_requirements
-except ImportError:  # for pip <= 9.0.3
-    from pip.req import parse_requirements
+from pip._internal.req import parse_requirements
 
 PACKAGE = "business_logic"
 NAME = "django-business-logic"
@@ -76,6 +73,13 @@ if sys.argv[-1] == 'publish':
     print("  git push --tags")
     sys.exit()
 
+install_reqs = parse_requirements(abs_path('requirements.txt'), session=False)
+
+try:
+    requirements = [str(x.req) for x in install_reqs]
+except AttributeError:
+    requirements = [str(x.requirement) for x in install_reqs]
+
 setup(
     name=NAME,
     version=get_version(PACKAGE),
@@ -106,25 +110,18 @@ setup(
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
         'Topic :: Internet :: WWW/HTTP',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Framework :: Django',
-        'Framework :: Django :: 1.11',
-        'Framework :: Django :: 2.0',
-        'Framework :: Django :: 2.1',
         'Framework :: Django :: 2.2',
+        'Framework :: Django :: 3.0',
+        'Framework :: Django :: 3.1',
     ],
     zip_safe=False,
-    install_requires=[
-        '{}; {}'.format(x.req, x.markers) if x.markers else str(x.req)
-        for x in parse_requirements(abs_path('requirements.txt'), session=False)
-    ],
+    install_requires=requirements,
 )
