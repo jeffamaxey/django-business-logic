@@ -6,13 +6,7 @@ import operator
 from collections import OrderedDict
 from functools import reduce
 
-try:
-    from django.apps import apps
-
-    get_model = apps.get_model
-except ImportError:
-    from django.db.models.loading import get_model
-
+from django.apps import apps
 from django.db import models
 
 from rest_framework import generics, exceptions
@@ -20,7 +14,7 @@ from rest_framework import generics, exceptions
 from rest_framework.compat import distinct
 from rest_framework.decorators import api_view
 from rest_framework.filters import SearchFilter
-from rest_framework.pagination import CursorPagination
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
 from django_filters.rest_framework import DjangoFilterBackend
@@ -47,7 +41,7 @@ def api_root(request, format=None):
         )))
 
 
-class StandardResultsSetPagination(CursorPagination):
+class StandardResultsSetPagination(PageNumberPagination):
     page_size = 50
     page_size_query_param = 'page_size'
     max_page_size = 1000
@@ -111,6 +105,7 @@ class ExecutionList(ObjectList):
 class ExecutionView(generics.RetrieveDestroyAPIView):
     queryset = Execution.objects.all()
     serializer_class = ExecutionSerializer
+    pagination_class = StandardResultsSetPagination
 
 
 class LogView(generics.RetrieveAPIView):
@@ -177,7 +172,7 @@ class ReferenceBaseView(object):
     def get_reference_model(self):
         try:
             app_name, model_name = self.get_reference_model_name().split('.')
-            model = get_model(app_name, model_name)
+            model = apps.get_model(app_name, model_name)
         except (ValueError, LookupError):
             raise exceptions.NotFound()
 
