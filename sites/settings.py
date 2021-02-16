@@ -74,16 +74,3 @@ USE_I18N = True
 # USE_L10N = True
 
 USE_TZ = True
-
-
-# http://stackoverflow.com/a/28560805/138063
-class DisableMigrations(object):
-
-    def __contains__(self, item):
-        return True
-
-    def __getitem__(self, item):
-        if django.VERSION[1] < 9:
-            # django < 1.9
-            return "notmigrations"
-        return None
