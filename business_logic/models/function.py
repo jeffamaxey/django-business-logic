@@ -79,9 +79,7 @@ class PythonModuleFunctionDefinition(FunctionDefinition):
         else:
             module = import_module(self.module)
             code = getattr(module, self.function)
-        if self.is_context_required:
-            return code(context, *args)
-        return code(*args)
+        return code(context, *args) if self.is_context_required else code(*args)
 
 
 class PythonCodeFunctionDefinition(FunctionDefinition):

@@ -12,7 +12,10 @@ class ProgramTest(ProgramTestBase):
     def test_program_argument_field_variable_definition(self):
         int_value_field = self.fields['int_value']
         self.assertIsInstance(int_value_field.variable_definition, VariableDefinition)
-        self.assertEqual('{}.{}'.format(self.argument.name, 'int_value'), int_value_field.variable_definition.name)
+        self.assertEqual(
+            f'{self.argument.name}.int_value',
+            int_value_field.variable_definition.name,
+        )
 
     def test_program_argument_field_title_declared(self):
         title = 'test'
@@ -39,7 +42,7 @@ class ProgramTest(ProgramTestBase):
         self.argument.save()
         variable_definition = VariableDefinition.objects.get(id=int_value_field.variable_definition_id)
 
-        self.assertEqual('{}.{}'.format(self.argument.name, 'int_value'), variable_definition.name)
+        self.assertEqual(f'{self.argument.name}.int_value', variable_definition.name)
 
     def test_program_argument_deletion_should_delete_variable_definition(self):
         variable_definition = self.argument.variable_definition
@@ -67,12 +70,7 @@ class ProgramTest(ProgramTestBase):
         self.assertEqual(1 + 2 * 3, result.get_variable(variable_definition))
 
     def test_program_version_execute_args_check(self):
-        for kwargs in [
-                dict(test_model=1),
-                dict(test_model=self.test_model, xxx=1),
-                dict(tes_moddddel=self.test_model),
-                dict(),
-        ]:
+        for kwargs in [dict(test_model=1), dict(test_model=self.test_model, xxx=1), dict(tes_moddddel=self.test_model), {}]:
             with self.assertRaises(Exception) as exc:
                 self.program_version.execute(**kwargs)
 

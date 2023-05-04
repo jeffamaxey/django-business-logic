@@ -90,7 +90,7 @@ class BinaryOperator(Operator):
             return isinstance(value, Decimal)
 
         if len([x for x in args if is_decimal(x)]) == 1:
-            args = [Decimal(x) if not is_decimal(x) else x for x in args]
+            args = [x if is_decimal(x) else Decimal(x) for x in args]
 
         lhs, rhs = args
         return self.operator_table[self.operator](lhs, rhs)

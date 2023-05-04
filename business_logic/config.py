@@ -35,9 +35,9 @@ class ContextConfig(object):
     """object: default configuration values"""
 
     def __init__(self, **kwargs):
-        for k in kwargs.keys():
+        for k in kwargs:
             if k not in self.defaults:
-                raise TypeError('Incorrect kwarg {}'.format(k))
+                raise TypeError(f'Incorrect kwarg {k}')
 
         for k, v in self.defaults.items():
             kwargs.setdefault(k, v)

@@ -43,7 +43,7 @@ class Node(NS_Node):
         verbose_name_plural = _('Program nodes')
 
     def __str__(self):
-        return 'Node {}({}): {}'.format(self.id, self.content_type, self.content_object)
+        return f'Node {self.id}({self.content_type}): {self.content_object}'
 
     @staticmethod
     def ensure_content_object_saved(**kwargs):
@@ -102,6 +102,8 @@ class Node(NS_Node):
             :class:`business_logic.models.Node`: root node of cloned tree
 
         """
+
+
         class CloneVisitor(NodeVisitor):
 
             def __init__(self):
@@ -117,19 +119,23 @@ class Node(NS_Node):
                     content_object_clone.save()
                     node_kwargs = dict(content_object=content_object_clone)
                 else:
-                    node_kwargs = dict()
+                    node_kwargs = {}
 
                 if self.clone is None:
                     clone = self.clone = Node.add_root(**node_kwargs)
                     clone.rgt = node.rgt
                     clone.lft = node.lft
-                    clone.save()
                 else:
-                    node_kwargs.update(
-                        dict([(field_name, getattr(node, field_name)) for field_name in ('rgt', 'lft', 'depth')]))
-                    node_kwargs.update(dict(tree_id=self.clone.tree_id))
+                    node_kwargs |= dict(
+                        [
+                            (field_name, getattr(node, field_name))
+                            for field_name in ('rgt', 'lft', 'depth')
+                        ]
+                    )
+                    node_kwargs |= dict(tree_id=self.clone.tree_id)
                     clone = Node.objects.create(**node_kwargs)
-                    clone.save()
+                clone.save()
+
 
         visitor = CloneVisitor()
         visitor.preorder(self)

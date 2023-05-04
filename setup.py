@@ -26,7 +26,7 @@ def get_version(package):
     Return package version as listed in `__version__` in `init.py`.
     """
     init_py = open(os.path.join(package, '__init__.py')).read()
-    return re.search("__version__ = ['\"]([^'\"]+)['\"]", init_py).group(1)
+    return re.search("__version__ = ['\"]([^'\"]+)['\"]", init_py)[1]
 
 
 version = get_version(PACKAGE)
@@ -62,7 +62,7 @@ def abs_path(*parts):
 
 
 def clean():
-    for d in ('dist', 'build', '{}.egg-info'.format(NAME.replace('-', '_'))):
+    for d in ('dist', 'build', f"{NAME.replace('-', '_')}.egg-info"):
         if os.path.exists(d):
             shutil.rmtree(d)
 
@@ -72,7 +72,7 @@ if sys.argv[-1] == 'publish':
     os.system("python setup.py sdist bdist_wheel") and sys.exit(1)
     os.system("twine upload dist/*") and sys.exit(1)
     print("You probably want to also tag the version now:")
-    print("  git tag -a %s -m 'version %s'" % (version, version))
+    print(f"  git tag -a {version} -m 'version {version}'")
     print("  git push --tags")
     sys.exit()
 
@@ -80,11 +80,13 @@ setup(
     name=NAME,
     version=get_version(PACKAGE),
     description=DESCRIPTION,
-    long_description=codecs.open(abs_path('README.rst'), encoding='utf-8').read(),
+    long_description=codecs.open(
+        abs_path('README.rst'), encoding='utf-8'
+    ).read(),
     author=AUTHOR,
     author_email=AUTHOR_EMAIL,
     url=URL,
-    download_url='{}/archive/{}.tar.gz'.format(URL, version),
+    download_url=f'{URL}/archive/{version}.tar.gz',
     packages=get_packages(PACKAGE),
     package_data={
         PACKAGE: [
@@ -124,7 +126,9 @@ setup(
     ],
     zip_safe=False,
     install_requires=[
-        '{}; {}'.format(x.req, x.markers) if x.markers else str(x.req)
-        for x in parse_requirements(abs_path('requirements.txt'), session=False)
+        f'{x.req}; {x.markers}' if x.markers else str(x.req)
+        for x in parse_requirements(
+            abs_path('requirements.txt'), session=False
+        )
     ],
 )
